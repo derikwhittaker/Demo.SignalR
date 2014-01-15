@@ -36,7 +36,10 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/js")
     @Scripts.Render("~/bundles/bootstrap")
+    
     <script src="http://localhost:26482/signalr/hubs"></script>
+    
+    @*<script src="http://signalrmvchost.azurewebsites.net/signalr/hubs"></script>*@
     @RenderSection("scripts", required: false)
 </body>
 </html>

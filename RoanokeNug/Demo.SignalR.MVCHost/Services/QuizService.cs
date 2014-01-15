@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI;
+using System.Web.WebPages.Scope;
 
 namespace Demo.SignalR.MVCHost.Services
 {
     public class QuizService
     {
         // i know, i know, i know... but it is for a demo
+        private static IList<User> _users = new List<User>(); 
         private static IList<Question> _questions;
         private static object _questionLock = new object();
+        private static object _userLock = new object();
+        private static string _adminConnectionId;
 
         static QuizService()
         {
@@ -17,6 +22,15 @@ namespace Demo.SignalR.MVCHost.Services
 
         public Question NextQuestion()
         {
+            // this will just reset the questions logic
+            if (_questions.All(x => x.BeenAsked))
+            {
+                foreach (var question in _questions)
+                {
+                    question.BeenAsked = false;
+                }
+            }
+
             var nextQuestion = _questions.FirstOrDefault(x => !x.BeenAsked);
 
             if (nextQuestion != null)
@@ -52,6 +66,14 @@ namespace Demo.SignalR.MVCHost.Services
                 }
 
                 return null;
+            }
+        }
+
+        public void RegisterUser(string connectionId, string name)
+        {
+            lock (_userLock)
+            {
+                Users.Add(new User { ConnectionId = connectionId, Name = name });
             }
         }
 
@@ -113,6 +135,22 @@ namespace Demo.SignalR.MVCHost.Services
         }
 
         #endregion
+
+        public void RegisterAdmin(string connectionId)
+        {
+            AdminConnectionId = connectionId;
+        }
+
+        public string AdminConnectionId
+        {
+            get { return _adminConnectionId; }
+            set { _adminConnectionId = value; }
+        }
+
+        public IList<User> Users
+        {
+            get { return _users; }
+        }
     }
 
     public class Question
@@ -156,6 +194,12 @@ namespace Demo.SignalR.MVCHost.Services
     {
         public bool WasCorrect { get; set; }
         public string CorrectAnswerId { get; set; }
+    }
+
+    public class User
+    {
+        public string ConnectionId { get; set; }
+        public string Name { get; set; }
     }
 
 }

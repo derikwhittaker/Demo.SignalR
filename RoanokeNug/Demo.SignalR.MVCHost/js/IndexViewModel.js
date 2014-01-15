@@ -5,6 +5,7 @@
 
         function IndexViewModel() {
             this.CurrentQuiz = new Quiz();
+            this.Users = ko.observableArray([]);
             this.QuizHub = this.setupHubConnection();
         }
 
@@ -26,11 +27,37 @@
                     });
                 } 
 
-            };;
+            };
+
+            quizHub.client.userRegistered = function(connectionId, userName) {
+                console.log("User Registered: ID: " + connectionId + " UserName: " + userName);
+
+                self.Users.push({
+                    UserName: userName
+                });
+            };
+            
+            quizHub.client.userUnregistered = function (connectionId, userName) {
+                console.log("User UnrRegistered: ID: " + connectionId + " UserName: " + userName);
+
+                var foundUser = _.find(self.Users(), function(user) {
+                    return user.UserName == userName;
+                });
+                
+                if (foundUser) {
+                    self.Users.pop(foundUser);
+                }
+            };
+
+            quizHub.client.tallySubmittedAnser = function(submittedAnswer) {
+                console.log("User Submitted Answer: " + submittedAnswer);
+            };
 
             $.connection.hub.start()
                 .done(function() {
                     console.log("Connected to SignalR Quiz Hub");
+
+                    quizHub.server.registerAdmin();
                 });
 
             return quizHub;

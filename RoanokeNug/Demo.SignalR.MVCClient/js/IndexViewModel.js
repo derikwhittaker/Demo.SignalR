@@ -3,6 +3,8 @@ var MVCClient;
     // Class
     var IndexViewModel = (function () {
         function IndexViewModel() {
+            //public SignalRHost = "http://signalrmvchost.azurewebsites.net/signalr";
+            this.SignalRHost = "http://localhost:26482/signalr";
             this.UserName = ko.observable("");
             this.Quiz = ko.observable(new Quiz());
             this.QuizHub = this.connectToHub();
@@ -44,7 +46,7 @@ var MVCClient;
                 });
             };
 
-            $.connection.hub.url = "http://localhost:26482/signalr";
+            $.connection.hub.url = self.SignalRHost;
             $.connection.hub.start().done(function () {
                 console.log("Connected to SignalR Quiz Hub");
             });
@@ -66,6 +68,8 @@ var MVCClient;
         IndexViewModel.prototype.startGame = function () {
             $("#signIn").hide();
             $("#playGame").show();
+
+            this.QuizHub.server.registerUser(this.UserName());
         };
         return IndexViewModel;
     })();

@@ -15,12 +15,15 @@ interface IQuizHubClient {
 
 interface IQuizHubServer {
     submitAnswer(questionId: string, answerId: string);
+    registerUser(userName: string);
 }
 
 module MVCClient {
 
     // Class
     export class IndexViewModel {
+        //public SignalRHost = "http://signalrmvchost.azurewebsites.net/signalr";
+        public SignalRHost = "http://localhost:26482/signalr";
         public QuizHub: HubProxy;
         public UserName: KnockoutObservable<string> = ko.observable("");
         public Quiz: KnockoutObservable<Quiz> = ko.observable(new Quiz());
@@ -70,7 +73,7 @@ module MVCClient {
                 });
             };
 
-            $.connection.hub.url = "http://localhost:26482/signalr";
+            $.connection.hub.url = self.SignalRHost;
             $.connection.hub.start()
                 .done(() => {
                     console.log("Connected to SignalR Quiz Hub");
@@ -94,6 +97,7 @@ module MVCClient {
             $("#signIn").hide();
             $("#playGame").show();
 
+            this.QuizHub.server.registerUser(this.UserName());
         }
     }
 
