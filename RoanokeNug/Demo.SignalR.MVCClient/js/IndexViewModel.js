@@ -15,6 +15,7 @@ var MVCClient;
                 console.log(question);
 
                 var tmpQuiz = new Quiz();
+                tmpQuiz.Id(question.Id);
                 tmpQuiz.Question(question.Text);
 
                 _.each(question.Answers, function (answer) {
@@ -22,11 +23,25 @@ var MVCClient;
                     tmpQuiz.Answers.push(tmpAnswer);
                 });
 
-                //tmpQuiz.Answers.push(new Answer(1, "Some Question 1", false));
-                //tmpQuiz.Answers.push(new Answer(2, "Some Question 2", false));
-                //tmpQuiz.Answers.push(new Answer(3, "Some Question 3", true));
-                //tmpQuiz.Answers.push(new Answer(4, "Some Question 4", false));
                 self.Quiz(tmpQuiz);
+            };
+
+            quizHub.client.submittedAnswerResult = function (submissionResult) {
+                console.log("Submisson Result " + submissionResult);
+                var quiz = self.Quiz();
+                _.each(quiz.Answers(), function (answer) {
+                    if (answer.Id() === submissionResult.CorrectAnswerId) {
+                        if (answer.SelectedAnswer() === submissionResult.CorrectAnswerId) {
+                            answer.Status("correctlyAnswered");
+                        } else if (answer.SelectedAnswer() === false) {
+                            answer.Status("expectedAnswer");
+                        }
+                    } else {
+                        if (answer.SelectedAnswer() !== false) {
+                            answer.Status("incorrectAnswer");
+                        }
+                    }
+                });
             };
 
             $.connection.hub.url = "http://localhost:26482/signalr";
@@ -37,16 +52,20 @@ var MVCClient;
             return quizHub;
         };
 
+        IndexViewModel.prototype.submitAnswer = function () {
+            var quiz = this.Quiz();
+            var questionId = quiz.Id();
+            var selectedAnswer = _.find(quiz.Answers(), function (answer) {
+                return answer.SelectedAnswer() != false;
+            });
+            var selectedAnswerId = selectedAnswer.Id();
+
+            this.QuizHub.server.submitAnswer(questionId, selectedAnswerId);
+        };
+
         IndexViewModel.prototype.startGame = function () {
             $("#signIn").hide();
             $("#playGame").show();
-            //var tmpQuiz = new Quiz();
-            //tmpQuiz.Question("Which Answer looks the best?");
-            //tmpQuiz.Answers.push(new Answer(1, "Some Question 1", false));
-            //tmpQuiz.Answers.push(new Answer(2, "Some Question 2", false));
-            //tmpQuiz.Answers.push(new Answer(3, "Some Question 3", true));
-            //tmpQuiz.Answers.push(new Answer(4, "Some Question 4", false));
-            //this.Quiz(tmpQuiz);
         };
         return IndexViewModel;
     })();
@@ -54,6 +73,7 @@ var MVCClient;
 
     var Quiz = (function () {
         function Quiz() {
+            this.Id = ko.observable("");
             this.Question = ko.observable("");
             this.Answers = ko.observableArray([]);
         }
@@ -63,11 +83,25 @@ var MVCClient;
 
     var Answer = (function () {
         function Answer(answerId, answerText) {
+            var _this = this;
             this.Id = ko.observable("");
             this.Text = ko.observable("");
-            this.IsCorrect = ko.observable(false);
+            this.Status = ko.observable("");
+            this.SelectedAnswer = ko.observable(false);
             this.Id(answerId);
             this.Text(answerText);
+
+            this.StatusCSS = ko.computed(function () {
+                if (_this.Status() == "correctlyAnswered") {
+                    return "correct-answer";
+                } else if (_this.Status() == "expectedAnswer") {
+                    return "correct-answer";
+                } else if (_this.Status() == "incorrectAnswer") {
+                    return "wrong-answer";
+                }
+
+                return "";
+            });
         }
         return Answer;
     })();

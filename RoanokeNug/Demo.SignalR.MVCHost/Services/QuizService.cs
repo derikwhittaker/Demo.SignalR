@@ -6,8 +6,9 @@ namespace Demo.SignalR.MVCHost.Services
 {
     public class QuizService
     {
-        // i know, i know, i know... but it for a demo
+        // i know, i know, i know... but it is for a demo
         private static IList<Question> _questions;
+        private static object _questionLock = new object();
 
         static QuizService()
         {
@@ -27,9 +28,31 @@ namespace Demo.SignalR.MVCHost.Services
             return nextQuestion;
         }
 
-        public void SubmitAnswer(string questionId, Submission submission, Answer answer)
+        public SubmissionResult SubmitAnswer(string questionId, string answerId, string connectionId)
         {
-            
+            lock (_questionLock)
+            {
+                var foundQuestion = _questions.FirstOrDefault(x => x.Id == questionId);
+                if (foundQuestion != null)
+                {
+                    var correctAnswer = foundQuestion.Answers.FirstOrDefault(x => x.IsCorrect);
+                    if (correctAnswer == null) { return null; }
+                    foundQuestion.Submissions.Add(new Submission
+                    {
+                        AnswerId = answerId,
+                        ConnectionId = connectionId,
+                        WasCorrect = correctAnswer.Id == answerId
+                    });
+
+                    return new SubmissionResult
+                    {
+                        WasCorrect = correctAnswer.Id == answerId,
+                        CorrectAnswerId = correctAnswer.Id
+                    };
+                }
+
+                return null;
+            }
         }
 
         #region Qustion Builder
@@ -127,6 +150,12 @@ namespace Demo.SignalR.MVCHost.Services
         public string ConnectionId { get; set; }
         public string AnswerId { get; set; }
         public bool WasCorrect { get; set; }
+    }
+
+    public class SubmissionResult
+    {
+        public bool WasCorrect { get; set; }
+        public string CorrectAnswerId { get; set; }
     }
 
 }

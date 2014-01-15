@@ -13,9 +13,13 @@ namespace Demo.SignalR.MVCHost.Hubs
             _quizService = new QuizService();    
         }
 
-        public void SubmitAnswer()
+        public void SubmitAnswer(string questionId, string answerId)
         {
-            
+            var connectionId = Context.ConnectionId;
+
+            var submissionResult = _quizService.SubmitAnswer(questionId, answerId, connectionId);
+
+            Clients.Caller.submittedAnswerResult(submissionResult);
         }
 
         public void SubmitAnswerResults()

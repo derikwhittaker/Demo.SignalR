@@ -10,9 +10,11 @@ interface HubProxy {
 
 interface IQuizHubClient {
     receiveNewQuestion(question: any);
+    submittedAnswerResult(submissionResult: any);
 }
 
 interface IQuizHubServer {
+    submitAnswer(questionId: string, answerId: string);
 }
 
 module MVCClient {
@@ -35,20 +37,37 @@ module MVCClient {
                 console.log(question);
 
                 var tmpQuiz = new Quiz();
+                tmpQuiz.Id(question.Id);
                 tmpQuiz.Question(question.Text);
 
                 _.each(question.Answers, (answer) => {
                     var tmpAnswer = new Answer(answer.Id, answer.Text);
                     tmpQuiz.Answers.push(tmpAnswer);
                 });
-
-                //tmpQuiz.Answers.push(new Answer(1, "Some Question 1", false));
-                //tmpQuiz.Answers.push(new Answer(2, "Some Question 2", false));
-                //tmpQuiz.Answers.push(new Answer(3, "Some Question 3", true));
-                //tmpQuiz.Answers.push(new Answer(4, "Some Question 4", false));
-               
+                               
                 self.Quiz(tmpQuiz);
                 
+            };
+
+            quizHub.client.submittedAnswerResult = (submissionResult) => {
+                console.log("Submisson Result " + submissionResult);
+                var quiz = self.Quiz();
+                _.each(quiz.Answers(), (answer) => {
+
+                    if (answer.Id() === submissionResult.CorrectAnswerId) {
+                        if (answer.SelectedAnswer() === submissionResult.CorrectAnswerId) {
+                            answer.Status("correctlyAnswered"); // got it right
+                        }
+                        else if (answer.SelectedAnswer() === false) {
+                            answer.Status("expectedAnswer"); // we got it wrong, this should have been the answer
+                        }
+                    }
+                    else {
+                        if (answer.SelectedAnswer() !== false) {
+                            answer.Status("incorrectAnswer"); // we got it wrong, this is what we selected
+                        }
+                    }
+                });
             };
 
             $.connection.hub.url = "http://localhost:26482/signalr";
@@ -60,23 +79,26 @@ module MVCClient {
             return quizHub;
         }
 
+        public submitAnswer() {
+
+            var quiz = this.Quiz();
+            var questionId = quiz.Id();
+            var selectedAnswer = _.find(quiz.Answers(), function (answer) { return answer.SelectedAnswer() != false; });
+            var selectedAnswerId = selectedAnswer.Id();
+
+            this.QuizHub.server.submitAnswer(questionId, selectedAnswerId);
+        }
+
         public startGame() {
 
             $("#signIn").hide();
             $("#playGame").show();
 
-            //var tmpQuiz = new Quiz();
-            //tmpQuiz.Question("Which Answer looks the best?");
-            //tmpQuiz.Answers.push(new Answer(1, "Some Question 1", false));
-            //tmpQuiz.Answers.push(new Answer(2, "Some Question 2", false));
-            //tmpQuiz.Answers.push(new Answer(3, "Some Question 3", true));
-            //tmpQuiz.Answers.push(new Answer(4, "Some Question 4", false));
-
-            //this.Quiz(tmpQuiz);
         }
     }
 
     export class Quiz {
+        public Id: KnockoutObservable<string> = ko.observable("");
         public Question: KnockoutObservable<string> = ko.observable("");
         public Answers: KnockoutObservableArray<Answer> = ko.observableArray([]);
 
@@ -85,11 +107,28 @@ module MVCClient {
     export class Answer {
         public Id: KnockoutObservable<string> = ko.observable("");
         public Text: KnockoutObservable<string> = ko.observable("");
-        public IsCorrect: KnockoutObservable<boolean> = ko.observable(false);
+        public Status: KnockoutObservable<string> = ko.observable("");
+        public SelectedAnswer: KnockoutObservable<boolean> = ko.observable(false);
+
+        public StatusCSS: KnockoutComputed<string>;
 
         constructor(answerId: string, answerText: string) {
             this.Id(answerId);
             this.Text(answerText);
+
+            this.StatusCSS = ko.computed(() => {
+                if (this.Status() == "correctlyAnswered") {
+                    return "correct-answer";
+                }
+                else if (this.Status() == "expectedAnswer") {
+                    return "correct-answer";
+                }
+                else if (this.Status() == "incorrectAnswer") {
+                    return "wrong-answer";
+                }
+
+                return "";
+            });
         }
     }
 }

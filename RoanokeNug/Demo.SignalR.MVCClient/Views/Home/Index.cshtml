@@ -21,12 +21,12 @@
         <ol data-bind="foreach: Quiz().Answers">
             <li>
                 <div>
-                    <input type="radio" name="answers" /><div class="mar-left-5" style="display: inline-block" data-bind="text:Text"></div>
+                    <input type="radio" name="answers" data-bind="value: Id, checked: SelectedAnswer" /><div class="mar-left-5" style="display: inline-block" data-bind="text:Text, css: StatusCSS"></div>
                 </div>
             </li>
         </ol>
         <div class="mar-top-5">
-            <a class="btn btn-primary" data-bind="click: startGame">Submit &raquo;</a>
+            <a class="btn btn-primary" data-bind="click: submitAnswer">Submit &raquo;</a>
         </div>
     </div>
 </div>
