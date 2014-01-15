@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>AnswerR Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <h2>Ask New Question</h2>
+        <p><a data-bind="click: sendNextQuestion" class="btn btn-default">Ask &raquo;</a></p>
+    </div>
+    <div class="col-md-5">
+        <h2>Current Question</h2>
+        <div data-bind="with: CurrentQuiz">
+            <p>Question: <!--ko text: Question--><!--/ko--></p>
+            <p>Answers:</p>
+            <ol data-bind="foreach: Answers">
+                <li class="correct-answer">
+                    <div>
+                        <div class="mar-left-5" style="display: inline-block" data-bind="text:Text"></div>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        (function () {
+            var vm = new MVCHost.IndexViewModel();            
+            var rootDom = $("#root")[0];
+            
+            ko.applyBindings(vm, rootDom);
+        })();
+    </script>
+
+}

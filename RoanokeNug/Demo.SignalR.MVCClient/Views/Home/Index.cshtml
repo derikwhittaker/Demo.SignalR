@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>AnswerR Demo</h1>
+</div>
+
+<div id ="root" class="row">
+    <div id="signIn" class="col-md-4">
+        <h2>Who are You?</h2>
+        <input type="text" data-bind="value: UserName, valueUpdate: 'afterkeydown'" />
+        <p class="mar-top-5">
+            <a class="btn btn-primary" data-bind="click: startGame">Start Game &raquo;</a>
+        </p>
+    </div>
+
+    <div id="playGame" class="col-md-4">
+        <h3>Hello <!--ko text: UserName--><!--/ko--></h3>
+        <h4>Question: <!--ko text: Quiz().Question--><!--/ko--></h4>
+        <ol data-bind="foreach: Quiz().Answers">
+            <li>
+                <div>
+                    <input type="radio" name="answers" /><div class="mar-left-5" style="display: inline-block" data-bind="text:Text"></div>
+                </div>
+            </li>
+        </ol>
+        <div class="mar-top-5">
+            <a class="btn btn-primary" data-bind="click: startGame">Submit &raquo;</a>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="~/js/IndexViewModel.js"></script>
+
+    <script>
+        (function () {
+            var vm = new MVCClient.IndexViewModel();
+            var rootDom = $("#root")[0];
+
+            //ko.applyBindingsWithValidation(vm, rootDom, MVCClient.Helpers.ValidationConfiguration);
+            ko.applyBindings(vm, rootDom);
+        })();
+    </script>
+
+}
+
+
