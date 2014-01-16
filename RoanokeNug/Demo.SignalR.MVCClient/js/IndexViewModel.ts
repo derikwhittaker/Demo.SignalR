@@ -93,6 +93,7 @@ module MVCClient {
             var questionId = quiz.Id();
             var selectedAnswer = _.find(quiz.Answers(), function (answer) { return answer.SelectedAnswer() != false; });
             var selectedAnswerId = selectedAnswer.Id();
+            quiz.submitted(true);
 
             this.QuizHub.server.submitAnswer(questionId, selectedAnswerId);
         }
@@ -110,6 +111,7 @@ module MVCClient {
         public Id: KnockoutObservable<string> = ko.observable("");
         public Question: KnockoutObservable<string> = ko.observable("");
         public Answers: KnockoutObservableArray<Answer> = ko.observableArray([]);
+        public submitted: KnockoutObservable<boolean> = ko.observable(false);
 
     }
 

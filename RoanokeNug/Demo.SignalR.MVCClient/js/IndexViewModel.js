@@ -65,6 +65,7 @@ var MVCClient;
                 return answer.SelectedAnswer() != false;
             });
             var selectedAnswerId = selectedAnswer.Id();
+            quiz.submitted(true);
 
             this.QuizHub.server.submitAnswer(questionId, selectedAnswerId);
         };
@@ -84,6 +85,7 @@ var MVCClient;
             this.Id = ko.observable("");
             this.Question = ko.observable("");
             this.Answers = ko.observableArray([]);
+            this.submitted = ko.observable(false);
         }
         return Quiz;
     })();
