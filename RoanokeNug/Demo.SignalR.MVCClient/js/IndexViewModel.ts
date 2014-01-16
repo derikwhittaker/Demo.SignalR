@@ -27,6 +27,7 @@ module MVCClient {
         public QuizHub: HubProxy;
         public UserName: KnockoutObservable<string> = ko.observable("");
         public Quiz: KnockoutObservable<Quiz> = ko.observable(new Quiz());
+        public IsConnected: KnockoutObservable<boolean> = ko.observable(null);
 
         constructor() {
             this.QuizHub = this.connectToHub();
@@ -77,6 +78,10 @@ module MVCClient {
             $.connection.hub.start()
                 .done(() => {
                     console.log("Connected to SignalR Quiz Hub");
+                    self.IsConnected(true);
+                })
+                .fail(() => {
+                    self.IsConnected(false);
                 });
 
             return quizHub;

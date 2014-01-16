@@ -61,7 +61,8 @@ namespace Demo.SignalR.MVCHost.Services
                     return new SubmissionResult
                     {
                         WasCorrect = correctAnswer.Id == answerId,
-                        CorrectAnswerId = correctAnswer.Id
+                        CorrectAnswerId = correctAnswer.Id,
+                        SubmittedAnswerId = answerId
                     };
                 }
 
@@ -194,6 +195,7 @@ namespace Demo.SignalR.MVCHost.Services
     {
         public bool WasCorrect { get; set; }
         public string CorrectAnswerId { get; set; }
+        public string SubmittedAnswerId { get; set; }
     }
 
     public class User

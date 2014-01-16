@@ -16,14 +16,15 @@
             quizHub.client.receiveNewQuestion = function (question) {
                 console.log(question);
                 
-                self.CurrentQuiz.Answers.removeAll();
-                self.CurrentQuiz.Question("");
+                self.CurrentQuiz.answers.removeAll();
+                self.CurrentQuiz.results.removeAll();
+                self.CurrentQuiz.question("");
                 
                 if (question != undefined) {
-                    self.CurrentQuiz.Question(question.Text);
+                    self.CurrentQuiz.question(question.Text);
                     _.each(question.Answers, function(answer) {
                         var newAnswer = new Answer(answer.Id, answer.Text);
-                        self.CurrentQuiz.Answers.push(newAnswer);
+                        self.CurrentQuiz.answers.push(newAnswer);
                     });
                 } 
 
@@ -51,6 +52,14 @@
 
             quizHub.client.tallySubmittedAnser = function(submittedAnswer) {
                 console.log("User Submitted Answer: " + submittedAnswer);
+
+                var result = {
+                    wasCorrect: submittedAnswer.WasCorrect,
+                    submittedAnswerId: submittedAnswer.SubmittedAnswerId,
+                    correctAnswerId: submittedAnswer.CorrectAnswerId
+                };
+
+                self.CurrentQuiz.results.push(result);
             };
 
             $.connection.hub.start()
@@ -73,8 +82,28 @@
 
     var Quiz = (function () {
         function Quiz() {
-            this.Question = ko.observable("");
-            this.Answers = ko.observableArray([]);
+            var self = this;
+            this.question = ko.observable("");
+            this.answers = ko.observableArray([]);
+            this.results = ko.observableArray([]);
+
+            this.correctCount = ko.computed(function () {
+
+                var count = _.filter(self.results(), function(result) {
+                    return result.wasCorrect === true;
+                }).length;
+
+                return count;
+            });
+            
+            this.incorrectCount = ko.computed(function () {
+
+                var count = _.filter(self.results(), function (result) {
+                    return result.wasCorrect === false;
+                }).length;
+
+                return count;
+            });
         }
         return Quiz;
     })();

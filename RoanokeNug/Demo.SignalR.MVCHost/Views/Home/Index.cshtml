@@ -14,15 +14,18 @@
     <div class="col-md-5">
         <h2>Current Question</h2>
         <div data-bind="with: CurrentQuiz">
-            <p>Question: <!--ko text: Question--><!--/ko--></p>
-            <p>Answers:</p>
-            <ol data-bind="foreach: Answers">
+            <h4>Question: <!--ko text: question--><!--/ko--></h4>
+            <h4>Answers:</h4>
+            <ol data-bind="foreach: answers">
                 <li class="correct-answer">
                     <div>
                         <div class="mar-left-5" style="display: inline-block" data-bind="text:Text"></div>
                     </div>
                 </li>
             </ol>
+            <h4>Results: </h4>
+            <p>Correct: <!--ko text:correctCount--><!--/ko--></p>
+            <p>Incorrect: <!--ko text:incorrectCount--><!--/ko--></p>
         </div>
 
     </div>

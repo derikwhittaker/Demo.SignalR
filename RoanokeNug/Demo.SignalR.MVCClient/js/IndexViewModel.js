@@ -7,6 +7,7 @@ var MVCClient;
             this.SignalRHost = "http://localhost:26482/signalr";
             this.UserName = ko.observable("");
             this.Quiz = ko.observable(new Quiz());
+            this.IsConnected = ko.observable(null);
             this.QuizHub = this.connectToHub();
         }
         IndexViewModel.prototype.connectToHub = function () {
@@ -49,6 +50,9 @@ var MVCClient;
             $.connection.hub.url = self.SignalRHost;
             $.connection.hub.start().done(function () {
                 console.log("Connected to SignalR Quiz Hub");
+                self.IsConnected(true);
+            }).fail(function () {
+                self.IsConnected(false);
             });
 
             return quizHub;
