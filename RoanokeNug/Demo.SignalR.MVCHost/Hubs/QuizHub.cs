@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Demo.SignalR.MVCHost.Services;
 using Microsoft.AspNet.SignalR;
@@ -13,6 +14,13 @@ namespace Demo.SignalR.MVCHost.Hubs
         {
             // no IoC for simplicity sake
             _quizService = new QuizService();    
+        }
+
+        public override Task OnConnected()
+        {
+            Debug.WriteLine(Context.ConnectionId);
+
+            return base.OnConnected();
         }
 
         public override Task OnDisconnected()

@@ -131,6 +131,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="js\Helpers.js" />
+    <Content Include="js\IndexViewModel.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Properties\PublishProfiles\SignalRMVCClient - FTP.pubxml" />
@@ -168,8 +170,6 @@
     <Content Include="Scripts\underscore.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="js\Helpers.ts" />
-    <TypeScriptCompile Include="js\IndexViewModel.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.validation\knockout.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
