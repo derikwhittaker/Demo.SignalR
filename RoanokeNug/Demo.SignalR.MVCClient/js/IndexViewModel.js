@@ -3,8 +3,8 @@ var MVCClient;
     // Class
     var IndexViewModel = (function () {
         function IndexViewModel() {
-            //public SignalRHost = "http://signalrmvchost.azurewebsites.net/signalr";
-            this.SignalRHost = "http://localhost:26482/signalr";
+            this.SignalRHost = "http://signalrmvchost.azurewebsites.net/signalr";
+            //this.SignalRHost = "http://localhost:26482/signalr";
             this.UserName = ko.observable("");
             this.Quiz = ko.observable(new Quiz());
             this.IsConnected = ko.observable(null);

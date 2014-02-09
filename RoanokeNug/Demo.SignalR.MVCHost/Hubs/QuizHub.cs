@@ -29,10 +29,7 @@ namespace Demo.SignalR.MVCHost.Hubs
 
             var foundUser = _quizService.Users.FirstOrDefault(x => x.ConnectionId == connectionId);
 
-            if (foundUser != null && !string.IsNullOrEmpty(_quizService.AdminConnectionId))
-            {
-                Clients.Client(_quizService.AdminConnectionId).userUnregistered(connectionId, foundUser.Name);
-            }
+            Clients.Group("Admin").userUnregistered(connectionId, foundUser.Name);
 
             return base.OnDisconnected();
         }
@@ -59,10 +56,8 @@ namespace Demo.SignalR.MVCHost.Hubs
 
             _quizService.RegisterUser(connectionId, userName);
 
-            if (!string.IsNullOrEmpty(_quizService.AdminConnectionId))
-            {
-                Clients.Client(_quizService.AdminConnectionId).userRegistered(connectionId, userName);
-            }
+
+            Clients.Group("Admin").userRegistered(connectionId, userName);
         }
 
         public void RegisterAdmin()
@@ -70,6 +65,8 @@ namespace Demo.SignalR.MVCHost.Hubs
             var connectionId = Context.ConnectionId;
 
             _quizService.RegisterAdmin(connectionId);
+
+            Groups.Add(connectionId, "Admin");
 
         }
 

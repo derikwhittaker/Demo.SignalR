@@ -15,7 +15,8 @@ namespace Demo.SignalR.CMDAdminClient
             
 
             var hubHost = new HubHost();
-            hubHost.Connect("http://localhost:26482/signalr").Wait();
+            hubHost.Connect("http://signalrmvchost.azurewebsites.net/signalr").Wait();
+            //hubHost.Connect("http://localhost:26482/signalr").Wait();
             Console.WriteLine("Connected to Hub");
 
             hubHost.QuizHubProxy.RegisterAdmin();
@@ -54,7 +55,22 @@ namespace Demo.SignalR.CMDAdminClient
 
         private void SetupProxy()
         {
+            _quizHubProxy.On<string, string>("userRegistered", HandleUserRegistered);
+            _quizHubProxy.On<string, string>("userUnregistered", HandleUserUnRegistered);
+            
             _quizHubProxy.On("receiveNewQuestion", HandleReceiveNewQuestion);
+        }
+
+        private void HandleUserRegistered(string connectionId, string userName)
+        {
+            Console.WriteLine("New User Regisered");
+            Console.WriteLine("UserName: {0}", userName);
+        }
+
+        private void HandleUserUnRegistered(string connectionId, string userName)
+        {
+            Console.WriteLine("User Unregistered");
+            Console.WriteLine("UserName: {0}", userName);
         }
 
         private void HandleReceiveNewQuestion(object data)

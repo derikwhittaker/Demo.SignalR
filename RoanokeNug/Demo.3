@@ -1,0 +1,9 @@
+            <input id="SaySomething" type="button" value="Say Something" />            
+            
+            quizHub.client.saySomething = function(message) {
+                $('#HelloMessage').append(message);
+            };    
+            
+            $('#SaySomething').click(function () {
+                quizHub.server.onlyMe("Hello Only Me");
+            });
